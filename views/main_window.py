@@ -690,6 +690,9 @@ class MainWindow(QMainWindow):
         """Show about dialog"""
         about_text = f"""
         LeafCheckAI v{APP_VERSION}
+        Authors :
+        • Mohammed El Amine Hamdani
+        • Mohammed Khalil Hadj Ahmed 
         
         Plant Disease Detection Application
         
@@ -707,6 +710,7 @@ class MainWindow(QMainWindow):
         Database: MongoDB
         
         For educational and research purposes.
+
         """
         
         QMessageBox.about(self, f"About {APP_NAME}", about_text)
