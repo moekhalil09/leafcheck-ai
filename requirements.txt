@@ -1,0 +1,9 @@
+# requirements.txt
+numpy==1.26.4
+torch==2.2.0
+torchvision==0.17.0
+PyQt5==5.15.10
+PyQt5-tools==5.15.9.3.3
+pymongo==4.6.0
+Pillow==10.1.0
+python-dotenv==1.0.0

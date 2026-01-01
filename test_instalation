@@ -1,0 +1,38 @@
+# test_config.py
+import sys
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent
+sys.path.append(str(project_root))
+
+print("Testing config imports...")
+
+try:
+    from config import (
+        APP_NAME, APP_VERSION, CLASS_NAMES,
+        MONGODB_URI, DATABASE_NAME, 
+        SCANS_COLLECTION, PLANTS_COLLECTION,
+        IMAGE_SIZE, SUPPORTED_EXTENSIONS
+    )
+    
+    print("✅ All config imports successful")
+    print(f"  App: {APP_NAME} v{APP_VERSION}")
+    print(f"  Classes: {len(CLASS_NAMES)}")
+    print(f"  MongoDB URI: {MONGODB_URI}")
+    print(f"  Database: {DATABASE_NAME}")
+    print(f"  Collections: {SCANS_COLLECTION}, {PLANTS_COLLECTION}")
+    print(f"  Image size: {IMAGE_SIZE}")
+    
+except ImportError as e:
+    print(f"❌ Import Error: {e}")
+    
+    # Check what's available
+    try:
+        import config
+        print(f"\nAvailable in config module:")
+        for item in dir(config):
+            if not item.startswith('_'):
+                print(f"  - {item}")
+    except:
+        print("Cannot import config at all")
