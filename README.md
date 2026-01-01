@@ -6,7 +6,7 @@ Users can upload a tomato leaf image and receive a disease prediction with a con
 
 - **Hadj Ahmed Mohammed Khalil** 
 - **Mohammed El Amine Hamdani**
-- **Charef Mohamed Amine**
+- **Charef Mohamed el amine**
 
 
 
@@ -99,6 +99,7 @@ This project is licensed under the **MIT License**.
 ---
 
 Made for learning and plant health 🌱
+
 
 
 
