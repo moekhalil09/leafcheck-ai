@@ -7,3 +7,4 @@ PyQt5-tools==5.15.9.3.3
 pymongo==4.6.0
 Pillow==10.1.0
 python-dotenv==1.0.0
+timm>=0.4.12
