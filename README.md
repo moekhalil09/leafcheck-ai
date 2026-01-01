@@ -2,6 +2,12 @@
 
 LeafCheckAI is a desktop application that detects **tomato leaf diseases** using a deep learning model.
 Users can upload a tomato leaf image and receive a disease prediction with a confidence score.
+## 👥 Contributors
+
+- **Hadj Ahmed Mohammed Khalil** – [@yourGitHub](https://github.com/yourGitHub)
+- **Mohammed El Amine Hamdani ** – [@friend1]([https://github.com/friend1](https://www.researchgate.net/profile/Mohammed-El-Amine-Hamdani))
+
+
 
 ## ✨ Features
 
@@ -92,3 +98,4 @@ This project is licensed under the **MIT License**.
 ---
 
 Made for learning and plant health 🌱
+
