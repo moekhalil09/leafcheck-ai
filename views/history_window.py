@@ -1,4 +1,4 @@
-# views/history_window.py - MINIMAL UPDATE FOR NEW MODEL
+# views/history_window.py - FIXED VERSION WITH DELETE
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
     QPushButton, QTableWidget, QTableWidgetItem,
@@ -19,6 +19,7 @@ class HistoryWindow(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.parent_window = parent
+        self.scan_ids = []  # Store scan IDs for each row
         self.setup_ui()
         self.load_history()
     
@@ -167,9 +168,14 @@ class HistoryWindow(QDialog):
             
             # Clear and populate table
             self.scan_table.setRowCount(0)
+            self.scan_ids = []  # Reset scan IDs list
             
             for i, scan in enumerate(filtered_scans):
                 self.scan_table.insertRow(i)
+                
+                # Store scan ID for this row
+                scan_id = scan.get("_id", "")
+                self.scan_ids.append(scan_id)
                 
                 # Date
                 timestamp = scan.get("created_at") or scan.get("diagnosis", {}).get("timestamp")
@@ -318,7 +324,6 @@ class HistoryWindow(QDialog):
             
             # Get selected scan data
             row = selected_rows[0].row()
-            scan_id = self.scan_table.item(row, 0).data(Qt.UserRole) if self.scan_table.item(row, 0) else None
             
             # Update info label
             disease = self.scan_table.item(row, 1).text() if self.scan_table.item(row, 1) else "Unknown"
@@ -367,25 +372,27 @@ class HistoryWindow(QDialog):
         details += f"⏱️ Inference Time: {inference_time}s\n"
         details += f"🩺 Status: {status}\n\n"
         
-        # Try to get more details from database
+        # Try to get more details from database using stored scan ID
         try:
-            all_scans = db_manager.get_recent_scans(limit=100, include_rejected=True)
-            if row < len(all_scans):
-                scan = all_scans[row]
-                diagnosis = scan.get("diagnosis", {})
-                details += "📝 ADDITIONAL INFO\n"
-                details += "-" * 30 + "\n"
-                if diagnosis.get("description"):
-                    details += f"Description: {diagnosis.get('description', '')}\n\n"
-                if diagnosis.get("symptoms"):
-                    details += "Symptoms:\n"
-                    for symptom in diagnosis.get("symptoms", [])[:3]:
-                        details += f"• {symptom}\n"
-                    details += "\n"
-                if diagnosis.get("treatment"):
-                    details += "Treatment:\n"
-                    for treatment in diagnosis.get("treatment", [])[:3]:
-                        details += f"• {treatment}\n"
+            if row < len(self.scan_ids):
+                scan_id = self.scan_ids[row]
+                # Get scan from database by ID
+                scan = db_manager.get_scan_by_id(scan_id)
+                if scan:
+                    diagnosis = scan.get("diagnosis", {})
+                    details += "📝 ADDITIONAL INFO\n"
+                    details += "-" * 30 + "\n"
+                    if diagnosis.get("description"):
+                        details += f"Description: {diagnosis.get('description', '')}\n\n"
+                    if diagnosis.get("symptoms"):
+                        details += "Symptoms:\n"
+                        for symptom in diagnosis.get("symptoms", [])[:3]:
+                            details += f"• {symptom}\n"
+                        details += "\n"
+                    if diagnosis.get("treatment"):
+                        details += "Treatment:\n"
+                        for treatment in diagnosis.get("treatment", [])[:3]:
+                            details += f"• {treatment}\n"
         except:
             pass
         
@@ -400,35 +407,54 @@ class HistoryWindow(QDialog):
         details_dialog.exec_()
     
     def delete_selected(self):
-        """Delete selected scan"""
+        """Delete selected scan from database"""
         selected_rows = self.scan_table.selectionModel().selectedRows()
         if not selected_rows:
             return
         
         row = selected_rows[0].row()
+        
+        # Get the scan ID for this row
+        if row >= len(self.scan_ids):
+            QMessageBox.warning(self, "Error", "Cannot delete: Scan ID not found")
+            return
+        
+        scan_id = self.scan_ids[row]
         disease = self.scan_table.item(row, 1).text() if self.scan_table.item(row, 1) else "Unknown"
+        date = self.scan_table.item(row, 0).text() if self.scan_table.item(row, 0) else "Unknown"
         
         reply = QMessageBox.question(
             self, 
             "Delete Scan",
             f"Are you sure you want to delete this scan?\n\n"
+            f"Date: {date}\n"
             f"Disease: {disease}\n"
-            f"Row: {row + 1}",
+            f"ID: {scan_id[:8]}",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
         )
         
         if reply == QMessageBox.Yes:
-            # TODO: Implement delete functionality
-            # You would need to get the scan ID from the database
-            # and call db_manager.delete_scan(scan_id)
-            
-            # For now, just remove from table
-            self.scan_table.removeRow(row)
-            QMessageBox.information(self, "Deleted", "Scan removed from view.")
-            
-            # Reload to refresh data
-            self.load_history()
+            try:
+                # Call database manager to delete by ID
+                success = db_manager.delete_scan(scan_id)
+                
+                if success:
+                    # Remove from table
+                    self.scan_table.removeRow(row)
+                    # Remove from scan_ids list
+                    if row < len(self.scan_ids):
+                        self.scan_ids.pop(row)
+                    
+                    QMessageBox.information(self, "Deleted", "Scan deleted successfully.")
+                    
+                    # Reload to refresh data
+                    self.load_history()
+                else:
+                    QMessageBox.warning(self, "Error", "Failed to delete scan from database.")
+                    
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Error deleting scan: {str(e)}")
     
     def keyPressEvent(self, event):
         """Handle key press events"""
