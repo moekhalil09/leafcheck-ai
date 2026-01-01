@@ -18,14 +18,14 @@ MODEL_PATH = MODEL_DIR / "MobileNetV2_Attentive.pth"  # Changed filename
 
 # Disease classes - 8 CLASSES (updated)
 CLASS_NAMES = [
+     "Tomato_Bacterial_Spot",   
     "Tomato_Early_Blight",
+    "Tomato_Healthy",
     "Tomato_Late_Blight", 
     "Tomato_Leaf_Mold",
-    "Tomato_Septoria_leaf_spot",
-    "Tomato_Bacterial_Spot",
-    "Tomato_mosaic_virus",
-    "Tomato_Yellow_Leaf_Curl_Virus",
-    "Tomato_Healthy"
+    "Tomato_Septoria_leaf_spot", 
+    "Tomato_Yellow_Leaf_Curl_Virus", 
+    "Tomato_mosaic_virus"
 ]
 
 # Application settings
