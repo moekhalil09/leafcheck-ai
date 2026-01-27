@@ -13,7 +13,7 @@ DATA_DIR = BASE_DIR / "data"
 for directory in [MODEL_DIR, ASSETS_DIR, DATA_DIR]:
     directory.mkdir(exist_ok=True)
 
-# Model file - UPDATE WITH YOUR NEW MODEL FILENAME
+# Model file -
 MODEL_PATH = MODEL_DIR / "MobileNetV2_Attentive.pth"  # Changed filename
 
 # Disease classes - 8 CLASSES (updated)
